@@ -1,3 +1,5 @@
+setwd(paste0(BASE_PATH, "/Plots"))
+
 ################################
 # Creating file-specific objects
 ################################
@@ -119,11 +121,11 @@ p <- ggplot(
   data = installed_planned_cap %>%
     filter(year <= 2027),
   aes(
-      x = year,
-      y = pct_of_additions,
-      fill = elec_source,
-      alpha = ifelse(year >= 2026, 0.5, 1)
-    )
+    x = year,
+    y = pct_of_additions,
+    fill = elec_source,
+    alpha = ifelse(year >= 2026, 0.5, 1)
+  )
 ) +
   geom_col() +
   scale_alpha_identity(guide = "none") +
