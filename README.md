@@ -1,7 +1,7 @@
 Repository contains R scripts and their plotting output, intended to facilitate a guided exploration
 on four questions regarding change in the contemporary energy sector:
 
-1. To what extent will supply constraints curtail global oil consumption in the next several decades?
+1. To what extent will supply constraints curtail global oil consumption in the coming decades?
 2. What is the regional distribution of the world's oil production, how has it changed over time, and what are the geopolitical implications of this changing distribution?
 3. How technologically mature are modern renewable sources of electricity like wind and solar, and to what extent will they displace fossil-sourced electricity in the coming decades?
 4. What is Louisiana’s role in the global energy economy?
