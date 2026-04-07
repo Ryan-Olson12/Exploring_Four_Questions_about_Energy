@@ -20,4 +20,4 @@ Data processing scripts are located in the R Scripts folder and output plots to 
 Each script produces one plot as its output (except for Oil Production by Country.R, which produces two
 plots, since both use data from the same EIA dataset). Two slides contain visuals not created in the R
 scripts: one with a screenshot from Lazard's annual LCOE report, and another with a photo of an
-ExxonMobil Refinery, taken from the top of the Louisiana State Capitol.
+ExxonMobil refinery, taken from the top of the Louisiana State Capitol.
