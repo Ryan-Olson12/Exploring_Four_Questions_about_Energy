@@ -11,7 +11,8 @@ The presentation is targeted for an undergraduate-level course on energy/climate
 ENVS 4261 (Energy and the Environment) at LSU. Thus, the first three questions above are framed somewhat
 more provocatively in the presentation itself.
 
-Main.R loads necessary libraries, sets custom themes and plotting functions to promote graphical
-consistency, and sources the scripts for data processing and visualization. Each processing script
-produces one plot as its output (except for Oil Production by Country.R, which produces two plots,
-since both use data from the same EIA dataset).
+Main.R loads necessary libraries, sets a custom theme and plotting functions to promote graphical
+consistency, and sources the scripts for data processing and visualization. Processing scripts are
+located in the R Scripts folder and output plots to the Plots folder. Each script produces one plot
+as its output (except for Oil Production by Country.R, which produces two plots,since both use data
+from the same EIA dataset).
