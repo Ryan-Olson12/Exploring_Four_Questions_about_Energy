@@ -13,7 +13,7 @@ more provocatively in the presentation itself.
 
 Main.R loads necessary libraries, sets a custom theme and plotting functions to promote graphical
 consistency, and sources the scripts for data processing and visualization. Some data is gathered via
-the EIA's API, which requires a key; data which is downloaded manually is located in the Data - Raw
+the EIA's API, which requires a key; data which is downloaded manually is located in the Data - raw
 folder.
 
 Data processing scripts are located in the R Scripts folder and output plots to the Plots folder.
