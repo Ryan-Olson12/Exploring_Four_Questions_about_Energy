@@ -1,7 +1,5 @@
-setwd(paste0(BASE_PATH, "/Plots"))
-
 ################################
-# Creating file-specific objects
+# Create file-specific objects
 ################################
 scenario_levels <- c(
   "Historical",
@@ -14,7 +12,7 @@ linetype_values <- c("solid", "dashed", "dashed", "dashed")
 color_values <- c("black", "orangered1", "goldenrod3", "springgreen4")
 
 #############################
-# Importing data from the IEA
+# Import data from the IEA
 #############################
 
 # World Energy Outlook
@@ -27,7 +25,7 @@ import_file <- file.path(
 weo <- read_csv(import_file) %>%
   clean_names()
 
-# Filtering to include series of interest
+# Filter to include series of interest
 weo <- weo %>%
   mutate(scenario = str_replace(scenario, " Scenario", "")) %>%
   filter(
@@ -36,7 +34,7 @@ weo <- weo %>%
     flow == "Total final consumption"
   )
 
-# Joining last historical with first projected data
+# Join last historical with first projected data
 last_historical <- weo %>%
   filter(scenario == "Historical") %>%
   slice_tail(n = 1) %>%
@@ -54,7 +52,7 @@ weo <- bind_rows(weo, bridged_scenarios) %>%
   arrange(desc(scenario))
 
 #################
-# Generating plot
+# Generate plot
 #################
 p <- ggplot(data = weo, aes(
   x = year,
@@ -65,16 +63,12 @@ p <- ggplot(data = weo, aes(
   geom_point(size = 5) +
   # Legend only necessary for one geom
   geom_line_nrg(show.legend = FALSE) +
-  scale_x_continuous(
-    breaks = seq(2010, max(weo$year), 10),
-    # Leaving extra padding for first and last points
-    expand = expansion(mult = c(0.01, 0.02))
-  ) +
+  scale_x_continuous_nrg(breaks = seq(2010, max(weo$year), 10)) +
   scale_linetype_manual(values = setNames(linetype_values, scenario_levels)) +
   scale_color_manual(values = setNames(color_values, scenario_levels)) +
   scale_y_continuous(
     limits = c(0, NA),
-    # Leaving extra padding for highest point
+    # Leave extra padding for highest point
     expand = expansion(mult = c(0, 0.015))
   ) +
   labs_nrg(
@@ -83,8 +77,10 @@ p <- ggplot(data = weo, aes(
     caption = "Source: International Energy Agency",
     y = "Exajoules"
   ) +
+  coord_cartesian(clip = "off") +
   theme_nrg()
 
 print(p)
 
+# Export plot
 save_nrg_plot("TFC from Oil.png")

@@ -2,11 +2,15 @@
 # Initial setup
 ################
 
-# Setting paths
-BASE_PATH <- "c:/Users/derek/Downloads/Energy Presentation"
+# Set paths
+BASE_PATH <- file.path(
+  "C:/Users/derek/OneDrive/Documents/GitHub",
+  "Exploring_Four_Questions_about_Energy/Energy Presentation"
+)
+
 SCRIPTS_PATH <- file.path(BASE_PATH, "R Scripts")
 
-# Importing necessary libraries
+# Import necessary libraries
 library(tidyverse)
 library(openxlsx2)
 library(scales)
@@ -14,10 +18,10 @@ library(janitor)
 library(eia)
 
 # Set EIA API key
-eia_set_key("pclmugwhOX4mhsjgp80hHSF4pLLiqdEYynC2WNjc")
+eia_set_key(Sys.getenv("EIA_API_KEY"))
 
 ##########################
-# Setting custom functions
+# Create custom functions
 ##########################
 
 # Theme
@@ -70,7 +74,7 @@ labs_nrg <- function(..., x = NULL) {
 }
 
 # Continuous x-axis scale specification
-scale_x_continuous_nrg <- function(..., expand = expansion(mult = c(0, 0))) {
+scale_x_continuous_nrg <- function(..., expand = expansion(mult = c(0, 0.017))) {
   scale_x_continuous(..., expand = expand)
 }
 
@@ -78,6 +82,9 @@ scale_x_continuous_nrg <- function(..., expand = expansion(mult = c(0, 0))) {
 save_nrg_plot <- function(..., width = 16, height = 9) {
   ggsave(..., width = width, height = height)
 }
+
+# Set working directory for plot export
+setwd(paste0(BASE_PATH, "/Plots"))
 
 ###################
 # Run all R scripts

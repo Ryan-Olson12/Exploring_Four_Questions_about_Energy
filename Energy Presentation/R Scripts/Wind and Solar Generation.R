@@ -1,7 +1,5 @@
-setwd(paste0(BASE_PATH, "/Plots"))
-
 ################################
-# Creating file-specific objects
+# Create file-specific objects
 ################################
 scenario_levels <- c(
   "Historical",
@@ -14,7 +12,7 @@ linetype_values <- c("solid", "dashed", "dashed", "dashed")
 color_values <- c("black", "orangered1", "goldenrod3", "forestgreen")
 
 ########################################
-# Importing Historical Data from the EIA
+# Import Historical Data from the EIA
 ########################################
 wind_solar_hist <- eia_data(
   dir = "electricity/electric-power-operational-data/data",
@@ -30,7 +28,7 @@ wind_solar_hist <- eia_data(
   rename(year = period, elec_gen_fuel = generation) %>%
   mutate(elec_gen_fuel = as.numeric(elec_gen_fuel))
 
-# Standardizing fuel names
+# Standardize fuel names
 wind_solar_hist <- wind_solar_hist %>%
   mutate(
     fuel = case_match(
@@ -43,7 +41,7 @@ wind_solar_hist <- wind_solar_hist %>%
     scenario = "Historical"
   )
 
-# Adding a column for total generation
+# Add a column for total generation
 wind_solar_hist <- wind_solar_hist %>%
   select(year, scenario, fuel, elec_gen_fuel) %>%
   left_join(
@@ -55,7 +53,7 @@ wind_solar_hist <- wind_solar_hist %>%
   mutate(year = as.numeric(year))
 
 ######################################
-# Importing Forecast Data from the EIA
+# Import Forecast Data from the EIA
 ######################################
 
 # Annual Energy Outlook data
@@ -79,7 +77,7 @@ wind_solar_aeo <- eia_data(
   rename(year = period, elec_gen = value) %>%
   mutate(elec_gen = as.numeric(elec_gen))
 
-# Combining wind and solar as consolidated categories
+# Combine wind and solar as consolidated categories
 wind_solar_aeo <- wind_solar_aeo %>%
   select(year, scenario, series_id, elec_gen) %>%
   mutate(fuel = case_match(
@@ -98,7 +96,7 @@ wind_solar_aeo <- wind_solar_aeo %>%
   group_by(year, scenario, fuel) %>%
   summarise(elec_gen_fuel = sum(elec_gen), .groups = "drop")
 
-# Adding a column for total generation
+# Add a column for total generation
 wind_solar_aeo <- wind_solar_aeo %>%
   left_join(
     wind_solar_aeo %>%
@@ -109,7 +107,7 @@ wind_solar_aeo <- wind_solar_aeo %>%
   mutate(year = as.numeric(year))
 
 ##############################
-# Importing data from the NREL
+# Import data from the NREL
 ##############################
 import_file <- file.path(
   BASE_PATH,
@@ -122,7 +120,7 @@ wind_solar_nrel <- read_csv(import_file, skip = 3) %>%
   clean_names() %>%
   rename(year = t)
 
-# Keeping only data of interest
+# Keep only data of interest
 wind_solar_nrel <- wind_solar_nrel %>%
   select(
     scenario,
@@ -133,7 +131,7 @@ wind_solar_nrel <- wind_solar_nrel %>%
     wind_onshore_mwh,
     generation_for_aer
   ) %>%
-  # Optimizing scenario names for legend
+  # Optimize scenario names for legend
   mutate(
     scenario = case_match(
       scenario,
@@ -143,12 +141,12 @@ wind_solar_nrel <- wind_solar_nrel %>%
       .default = scenario
     )
   ) %>%
-  # Keeping only scenarios specified above
+  # Keep only scenarios specified above
   filter(str_starts(scenario, "NREL"))
 
-# Combining wind and solar as consolidated categories
+# Combine wind and solar as consolidated categories
 wind_solar_nrel <- wind_solar_nrel %>%
-  # Giving capitalized names for immediate reshaping
+  # Give capitalized names for immediate reshaping
   mutate(
     Solar = csp_mwh + upv_mwh,
     Wind = wind_offshore_mwh + wind_onshore_mwh,
@@ -162,7 +160,7 @@ wind_solar_nrel <- wind_solar_nrel %>%
   )
 
 ############################
-# Binding EIA and NREL data
+# Bind EIA and NREL data
 ############################
 wind_solar_gen <- bind_rows(
   wind_solar_hist,
@@ -171,11 +169,11 @@ wind_solar_gen <- bind_rows(
 ) %>%
   mutate(scenario = factor(scenario, levels = scenario_levels))
 
-# Calculating fuels' share of total generation
+# Calculate fuels' share of total generation
 wind_solar_gen <- wind_solar_gen %>%
   mutate(fuel_pct = elec_gen_fuel / elec_gen_tot)
 
-# Aggregating solar and wind into a single category
+# Aggregate solar and wind into a single category
 plot_data <- wind_solar_gen %>%
   filter(fuel != "Total") %>%
   mutate(wind_solar = case_match(
@@ -188,7 +186,7 @@ plot_data <- wind_solar_gen %>%
   filter(scenario != "NREL (Permanent IRA)")
 
 #################
-# Generating plot
+# Generate plot
 #################
 p <- ggplot(
   data = plot_data, aes(
@@ -197,6 +195,7 @@ p <- ggplot(
 ) +
   geom_line_nrg() +
   geom_hline(yintercept = 0.5, color = "red", linewidth = 1) +
+  # Leave extra padding for last year
   scale_x_continuous_nrg() +
   scale_y_continuous(
     n.breaks = 6,
@@ -220,5 +219,5 @@ p <- ggplot(
 
 print(p)
 
-# Exporting plot
+# Export plot
 save_nrg_plot("Wind and Solar Generation.png")

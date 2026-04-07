@@ -1,7 +1,5 @@
-setwd(paste0(BASE_PATH, "/Plots"))
-
 ##########################
-# Importing data from OPEC
+# Import data from OPEC
 ##########################
 
 # Crude oil reserves
@@ -36,7 +34,7 @@ oil_demand <- wb_to_df(import_file, rows = 3:79) %>%
     names_to = "year",
     values_to = "demand"
   ) %>%
-  # Matching global observations w/ naming conventions in reserves data
+  # Match global observations w/ naming conventions in reserves data
   mutate(location = case_match(
     location,
     "Total world" ~ "Total World",
@@ -44,7 +42,7 @@ oil_demand <- wb_to_df(import_file, rows = 3:79) %>%
   )) %>%
   filter(location == "Total World")
 
-# Joining reserves and demand data
+# Join reserves and demand data
 world_oil_data <- full_join(
   oil_reserves,
   oil_demand,
@@ -52,16 +50,16 @@ world_oil_data <- full_join(
 ) %>%
   select(-location)
 
-# Converting data to numeric and standardizing units
+# Convert data to numeric and standardize units
 world_oil_data <- world_oil_data %>%
   mutate(
     across(everything(), ~ as.numeric(.x)),
-    # Converting from thousand bbl / day to million bbl
+    # Convert from thousand bbl / day to million bbl
     demand = demand * 365.25 / 1000,
     years_of_oil = reserves / demand
   )
 
-# Plot
+# Generate plot
 p <- ggplot(data = world_oil_data, aes(x = year)) +
   geom_area(aes(y = reserves / 1000, fill = "Reserves")) +
   geom_line_nrg(aes(y = years_of_oil * 32, color = "Years of Oil")) +
@@ -73,7 +71,9 @@ p <- ggplot(data = world_oil_data, aes(x = year)) +
     expand = expansion(mult = c(0, .05)),
     sec.axis = sec_axis(~ . / 32, name = "Years of Oil Remaining")
   ) +
-  scale_x_continuous_nrg(breaks = seq(1964, max(world_oil_data$year), 10)
+  scale_x_continuous_nrg(
+    breaks = seq(1964, max(world_oil_data$year), 10),
+    expand = expansion(mult = c(0, 0))
   ) +
   labs_nrg(
     title = "Global Proved Oil Reserves",
@@ -86,5 +86,5 @@ p <- ggplot(data = world_oil_data, aes(x = year)) +
 
 print(p)
 
-# Exporting plot
+# Export plot
 save_nrg_plot("Proved Reserves.png")

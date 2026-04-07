@@ -1,7 +1,5 @@
-setwd(paste0(BASE_PATH, "/Plots"))
-
 #############################
-# Importing data from the EIA
+# Import data from the EIA
 #############################
 
 # International data
@@ -24,16 +22,16 @@ oil_prod_country <- eia_data(
     year = as.numeric(year)
   )
 
-# Calculating regional percentages of world oil production
+# Calculate regional percentages of world oil production
 oil_prod_country <- oil_prod_country %>%
   select(year, country_region_id, oil_prod) %>%
-  # Pivoting wider for easier transformations
+  # Pivot wider for easier transformations
   pivot_wider(
     names_from = country_region_id,
     values_from = oil_prod,
     names_glue = "{.value}_{country_region_id}"
   ) %>%
-  # Generating bespoke regions and calculating percentages
+  # Generate bespoke regions and calculating percentages
   mutate(
     oil_prod_CAN_and_USA = oil_prod_CAN + oil_prod_USA,
     oil_prod_REST = oil_prod_WORL - oil_prod_CAN - oil_prod_USA,
@@ -43,14 +41,14 @@ oil_prod_country <- oil_prod_country %>%
       .names = "pct_{.col}"
     )
   ) %>%
-  # Pivoting back to long format for plotting
+  # Pivot back to long format for plotting
   pivot_longer(
     cols = starts_with("oil_prod_") | starts_with("pct_oil_prod_"),
     names_to = c(".value", "region"),
     names_pattern = "(oil_prod|pct_oil_prod)_(.*)"
   )
 
-# Preparing region names for clearer plotting
+# Prepare region names for clearer plotting
 oil_prod_country <- oil_prod_country %>%
   mutate(region = case_match(
     region,
@@ -63,7 +61,7 @@ oil_prod_country <- oil_prod_country %>%
   ))
 
 ###############################
-# Generating plot
+# Generate plot
 # U.S. + Canada Oil Production
 ###############################
 plot_data <- oil_prod_country %>%
@@ -84,8 +82,8 @@ p <- ggplot(data = plot_data, aes(x = year)) +
     aes(y = pct_oil_prod * 30, color = "Share"),
     show.legend = FALSE
   ) +
-  scale_x_continuous(
-    breaks = seq(2003, max(plot_data$year), 3),
+  scale_x_continuous_nrg(
+    breaks = seq(2001, max(plot_data$year), 4),
     expand = expansion(mult = c(0, 0))
   ) +
   scale_y_continuous(
@@ -110,10 +108,11 @@ p <- ggplot(data = plot_data, aes(x = year)) +
 
 print(p)
 
+# Export plot
 save_nrg_plot("Oil Production in US and Canada.png")
 
 ###############################
-# Generating plot
+# Generate plot
 # Oil Production by Country
 ###############################
 plot_data <- oil_prod_country %>%
@@ -127,12 +126,12 @@ plot_data <- oil_prod_country %>%
 
 p <- ggplot(data = plot_data, aes(
   x = year,
-  # Converting from thousand bbl / day to billion bbl / yr
+  # Convert from thousand bbl / day to billion bbl / yr
   y = oil_prod  / 1000000 * 365.25,
   color = region
 )) +
   geom_line_nrg() +
-  scale_x_continuous_nrg(breaks = seq(1974, max(plot_data$year), 10)) +
+  scale_x_continuous_nrg(breaks = seq(1975, max(plot_data$year), 10)) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.04))) +
   scale_color_manual(values = c(
     "U.S." = "deepskyblue4",

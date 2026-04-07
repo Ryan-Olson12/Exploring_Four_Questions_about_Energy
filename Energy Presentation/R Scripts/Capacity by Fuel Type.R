@@ -1,7 +1,5 @@
-setwd(paste0(BASE_PATH, "/Plots"))
-
 ################################
-# Creating file-specific objects
+# Create file-specific objects
 ################################
 elec_source_lvls <- c(
   "Other",
@@ -20,7 +18,7 @@ color_values <- c(
 )
 
 ########################################
-# Importing Historical Data from the EIA
+# Import Historical Data from the EIA
 ########################################
 import_file <- file.path(
   BASE_PATH,
@@ -39,13 +37,13 @@ wb_to_df_generator <- function(
     select(-c(latitude, longitude))
 }
 
-# Importing generator inventory data
+# Import generator inventory data
 operating <- wb_to_df_generator(sheet_name = "Operating")
 planned <- wb_to_df_generator(sheet_name = "Planned")
 retired <- wb_to_df_generator(sheet_name = "Retired")
 
 #####################################
-# Binding data from all status sheets
+# Bind data from all status sheets
 #####################################
 generator_inventory <- bind_rows(
   "Operating" = operating,
@@ -54,7 +52,7 @@ generator_inventory <- bind_rows(
   .id = "status"
 )
 
-# Creating an "Other" category for smaller sources
+# Create an "Other" category for smaller sources
 x <- generator_inventory %>%
   filter(operating_year >= 2020 | planned_operation_year >= 2020) %>%
   mutate(
@@ -115,7 +113,7 @@ installed_planned_cap <- installed_planned_cap %>%
   arrange(year)
 
 #################
-# Generating plot
+# Generate plot
 #################
 p <- ggplot(
   data = installed_planned_cap %>%
