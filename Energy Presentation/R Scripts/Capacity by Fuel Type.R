@@ -150,4 +150,5 @@ p <- ggplot(
 
 print(p)
 
+# Export plot
 save_nrg_plot("Capacity Additions by Fuel Type.png")

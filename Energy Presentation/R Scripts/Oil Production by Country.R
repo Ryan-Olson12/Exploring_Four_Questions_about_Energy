@@ -150,4 +150,5 @@ p <- ggplot(data = plot_data, aes(
 
 print(p)
 
+# Export plot
 save_nrg_plot("Oil Production in Selected Countries.png")
