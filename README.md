@@ -8,16 +8,16 @@ on four questions regarding change in the contemporary energy sector:
 
 The presentation is targeted for an undergraduate-level course on energy/climate economics; e.g., ECN
 326 (Climate Change and Clean Energy Economics: A Global Perspective) at the University of Portland or
-ENVS 4261 (Energy and the Environment) at LSU. Thus, the first three questions above are framed somewhat
-more provocatively in the presentation itself.
+ENVS 4261 (Energy and the Environment) at Louisiana State University. Thus, the first three questions
+above are framed somewhat more provocatively in the presentation itself.
 
 Main.R loads necessary libraries, sets a custom theme and plotting functions to promote graphical
-consistency, and sources the scripts for data processing and visualization. Some data is gathered via
+consistency, and sources the scripts for data processing and visualization. Some data are gathered via
 the EIA's API, which requires a key; data which is downloaded manually is located in the Data - raw
 folder.
 
 Data processing scripts are located in the R Scripts folder and output plots to the Plots folder.
 Each script produces one plot as its output (except for Oil Production by Country.R, which produces two
-plots, since both use data from the same EIA dataset). Two slides contain visuals not created in the R
-scripts: one with a screenshot from Lazard's annual LCOE report, and another with a photo of an
-ExxonMobil refinery, taken from the top of the Louisiana State Capitol.
+plots, since both use data from the same EIA dataset). Two slides near the presentation's end contain
+visuals not created in the R scripts: one with a screenshot from Lazard's annual LCOE report, and another
+with a photo of an ExxonMobil refinery, taken from the top of the Louisiana State Capitol.
