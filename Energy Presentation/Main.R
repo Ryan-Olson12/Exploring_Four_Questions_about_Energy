@@ -7,7 +7,6 @@ BASE_PATH <- file.path(
   "C:/Users/derek/OneDrive/Documents/GitHub",
   "Exploring_Four_Questions_about_Energy/Energy Presentation"
 )
-
 SCRIPTS_PATH <- file.path(BASE_PATH, "R Scripts")
 
 # Import necessary libraries
@@ -16,9 +15,10 @@ library(openxlsx2)
 library(scales)
 library(janitor)
 library(eia)
+library(rvest)
 
 # Set EIA API key
-eia_set_key(Sys.getenv("EIA_API_KEY"))
+eia_get_key(store = "sysenv")
 
 ##########################
 # Create custom functions
@@ -30,13 +30,10 @@ theme_nrg <- function(base_size = 20) {
     theme(
       # Plot
       plot.caption = element_text(
-        size = base_size * 0.8,
-        margin = margin(t = 11)
+        size = base_size * 0.8, margin = margin(t = 11)
       ),
       plot.title = element_text(
-        size = base_size * 2,
-        face = "bold",
-        hjust = 0.5
+        size = base_size * 2, face = "bold", hjust = 0.5
       ),
       plot.subtitle = element_text(size = base_size * 1.5, hjust = 0.5),
 
@@ -78,13 +75,18 @@ scale_x_continuous_nrg <- function(..., expand = expansion(mult = c(0, 0.017))) 
   scale_x_continuous(..., expand = expand)
 }
 
-# Save
-save_nrg_plot <- function(..., width = 16, height = 9) {
-  ggsave(..., width = width, height = height)
+# Save plot
+save_nrg_plot <- function(
+  filename,
+  output_dir = file.path(BASE_PATH, "Plots"),
+  width = 16,
+  height = 9,
+  ...
+) {
+  ggsave(
+    filename = filename, path = output_dir, width = width, height = height, ...
+  )
 }
-
-# Set working directory for plot export
-setwd(paste0(BASE_PATH, "/Plots"))
 
 ###################
 # Run all R scripts

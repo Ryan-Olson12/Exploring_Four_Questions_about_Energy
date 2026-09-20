@@ -20,19 +20,29 @@ color_values <- c(
 ########################################
 # Import Historical Data from the EIA
 ########################################
-import_file <- file.path(
-  BASE_PATH,
-  "Data - raw",
-  "2026 01 Generator Report.xlsx"
+eia_860m <- read_html("https://www.eia.gov/electricity/data/eia860m/")
+
+most_recent_report <- eia_860m |>
+  html_elements("a") |>
+  html_attr("href") |>
+  str_subset("generator\\d{4}\\.xlsx$") |>
+  pluck(1)
+
+file_path_860 <- file.path(
+  BASE_PATH, "Data - raw", basename(most_recent_report)
+)
+
+download.file(
+  paste0("https://www.eia.gov", most_recent_report), file_path_860, mode = "wb"
 )
 
 # Custom function for importing generator data
 wb_to_df_generator <- function(
   sheet_name = NULL
 ) {
-  wb_to_df(import_file, sheet = sheet_name, start_row = 3) %>%
-    clean_names() %>%
-    mutate(across(ends_with("_capacity_mw"), ~ as.numeric(.x))) %>%
+  wb_to_df(file_path_860, sheet = sheet_name, start_row = 3) |>
+    clean_names() |>
+    mutate(across(ends_with("_capacity_mw"), ~ as.numeric(.x))) |>
     # Location data unnecessary for analysis below
     select(-c(latitude, longitude))
 }
@@ -68,21 +78,21 @@ x <- generator_inventory %>%
   )
 
 # Create an object for already installed capacity
-installed_cap <- x %>%
-  filter(status %in% c("Operating", "Retired")) %>%
+installed_cap <- x |>
+  filter(status %in% c("Operating", "Retired")) |>
   summarise(
     installed_additions = sum(net_summer_capacity_mw, na.rm = TRUE),
     .by = c(operating_year, elec_source)
-  ) %>%
+  ) |>
   rename(year = operating_year)
 
 # Create an object for planned capacity
-planned_cap <- x %>%
-  filter(status == "Planned") %>%
+planned_cap <- x |>
+  filter(status == "Planned") |>
   summarise(
     planned_additions = sum(net_summer_capacity_mw),
     .by = c(planned_operation_year, elec_source)
-  ) %>%
+  ) |>
   rename(year = planned_operation_year)
 
 # Join installed and planned capacity
@@ -90,7 +100,7 @@ installed_planned_cap <- full_join(
   installed_cap,
   planned_cap,
   by = c("year", "elec_source")
-) %>%
+) |>
   # Create column for all additions (both installed and planned)
   mutate(
     planned_installed_additions = rowSums(
@@ -101,23 +111,20 @@ installed_planned_cap <- full_join(
   )
 
 # Calculate each source's share of total additions
-installed_planned_cap <- installed_planned_cap %>%
-  summarise(
-    total_additions = sum(planned_installed_additions),
-    .by = year
-  ) %>%
-  left_join(installed_planned_cap, .) %>%
+installed_planned_cap <- installed_planned_cap |>
   mutate(
-    pct_of_additions = planned_installed_additions / total_additions
-  ) %>%
+    total_additions = sum(planned_installed_additions, na.rm = TRUE),
+    pct_of_additions = planned_installed_additions / total_additions,
+    .by = year
+  ) |>
   arrange(year)
 
 #################
 # Generate plot
 #################
 p <- ggplot(
-  data = installed_planned_cap %>%
-    filter(year <= 2027),
+  data = installed_planned_cap |>
+    filter(year <= 2028),
   aes(
     x = year,
     y = pct_of_additions,
@@ -142,7 +149,7 @@ p <- ggplot(
     subtitle = "By Source",
     caption = paste(
       "Source: Energy Information Administration.",
-      "\nNote: 2026-27 values are for planned projects."
+      "\nNote: 2026-28 values include planned projects."
     ),
     y = "Percentage of Capacity Additions"
   ) +
